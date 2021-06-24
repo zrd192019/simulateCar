@@ -8,9 +8,19 @@ import java.util.HashMap;
  * Simulation Model is the main model of the simulation
  * @author Zhanghaoji
  * @date 2021.06.2021/6/23 11:59
+ * @author Zhengrundong
+ * @date 2021.06.2021/6/24 20:57
  */
 public class SimulationModel  {
-
+	
+	private final int RUNNING = 0;
+	
+	private final int CHARGING = 1;
+	
+	private final int ARRIVED = 2;
+	
+    private final double powerT = 25;//The power consumed per mile
+	
     private HashMap<String, Place> placeMap = new HashMap<>(); // all places
 
     private HashMap<String, Car> carMap = new HashMap<>(); // all cars
@@ -22,7 +32,9 @@ public class SimulationModel  {
     private String carText = ""; // car text to be displayed
 
     private String placeText = ""; // place text to be displayed
-
+    
+    private int state = RUNNING;
+    
     private void updateStationText() {
         String str = "充电站信息\n";
         str += "编号\t充电桩数量\t充电速度\t所在位置\n";
@@ -116,39 +128,68 @@ public class SimulationModel  {
              double x = car.getCurPlace().getX();
              double y = car.getCurPlace().getY();
              double dis = Place.getDistanceOf(car.getCurPlace(), placeMap.get(car.getWorkPlaceID()));
-             if(10*dis<car.getPower()) {
-            	 if(car.getCurPlace().getX()<placeMap.get(car.getWorkPlaceID()).getX()) {
-            		 car.setCurPlace(x+1,y);
-            		 car.setPower(car.getPower()-10);
-            	 }
-            	 else if(car.getCurPlace().getX()>placeMap.get(car.getWorkPlaceID()).getX()) {
-            		 car.setCurPlace(x-1,y);
-            		 car.setPower(car.getPower()-10);
-            	 }
-            	 else if(car.getCurPlace().getY()<placeMap.get(car.getWorkPlaceID()).getY()){
-            		 car.setCurPlace(x,y+1);
-            		 car.setPower(car.getPower()-10);
-            	 }
-            		
-            	 else if(car.getCurPlace().getY()>placeMap.get(car.getWorkPlaceID()).getY()){
-            		 car.setCurPlace(x,y-1);
-            		 car.setPower(car.getPower()-10);
-            	 }
-            		
-            	 else{
-            		 car.setSpeed(0);
-            	 }
+             if(powerT*dis<car.getPower()&&car.getPower()!=0) {
+            	 state = RUNNING;
+            	 carMovingStep(car,car.getCurPlace(), placeMap.get(car.getWorkPlaceID()),state);
              }
-
+             else if(powerT*dis>=car.getPower()&&car.getPower()!=0) {
+            	 double minDis = 40;
+            	 String minId = null;
+            	 state = RUNNING;
+            	 for(int j = 1; stationMap.containsKey(String.valueOf(j)); ++j) {
+                     Station sta = stationMap.get(String.valueOf(j));
+                     Place p = sta.getPlace();
+                    double disStation = Place.getDistanceOf(car.getCurPlace(), p);
+                    if(sta.addACar(car)) {
+                    	state = CHARGING;
+                    	
+                    }
+                    if(minDis>disStation) {
+                    	minDis = disStation;
+                    	minId = String.valueOf(j);
+                    }
+                 }
+            	 
+            	 carMovingStep(car,car.getCurPlace(), stationMap.get(minId).getPlace(),state);
+             }
+             else if(car.getPower()==0) {
+            	 car.setSpeed(0);
+             }
              carMap.replace(String.valueOf(i), car);
              updateCarText();
-             System.out.println(car.getCurPlace().getX()+","+ car.getCurPlace().getY());
+             updateStationText();
          }
-    	
     }
     
     
-    
+    public void carMovingStep(Car car,Place present,Place destination,int state) {
+    if(state==RUNNING) {
+   	 if(car.getCurPlace().getX()<placeMap.get(car.getWorkPlaceID()).getX()) {
+		 car.setCurPlace(car.getCurPlace().getX()+1,car.getCurPlace().getY());
+		 car.setPower(car.getPower()-powerT);
+	 }
+	 else if(car.getCurPlace().getX()>placeMap.get(car.getWorkPlaceID()).getX()) {
+		 car.setCurPlace(car.getCurPlace().getX()-1,car.getCurPlace().getY());
+		 car.setPower(car.getPower()-powerT);
+	 }
+	 else if(car.getCurPlace().getY()<placeMap.get(car.getWorkPlaceID()).getY()){
+		 car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()+1);
+		 car.setPower(car.getPower()-powerT);
+	 }
+		
+	 else if(car.getCurPlace().getY()>placeMap.get(car.getWorkPlaceID()).getY()){
+		 car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()-1);
+		 car.setPower(car.getPower()-powerT);
+	 }
+	 else 
+		 car.setSpeed(0);
+    }
+     
+	 else if(state==CHARGING){
+		 car.setSpeed(0);
+		 car.setPower(car.getPower()+powerT);
+	 }
+    }
     
     
     public HashMap<String, Place> getPlaceMap() {

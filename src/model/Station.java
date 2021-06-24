@@ -18,7 +18,9 @@ public class Station {
     private Place place; // place of the station
 
     private Vector<Car> carInLine = new Vector<>(); // the waiting line of cars
-
+    
+    
+    
     private final double eps = 1e-2;
 
     public Station(String id, int number, double chargingSpeed, Place p) {

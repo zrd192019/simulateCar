@@ -15,6 +15,8 @@ import java.io.File;
  * This is the main viewer of the program
  * @author Zhanghaoji
  * @date 2021.06.2021/6/21 20:54
+ * @author Zhengrundong
+ * @date 2021.06.2021/6/24 20:58
  */
 public class MainViewer extends JFrame implements Runnable{
     SimulationModel model;
@@ -30,19 +32,21 @@ public class MainViewer extends JFrame implements Runnable{
     private JButton playButton;
     private JButton pauseButton;
     private JButton endButton;
-	private int is_run = 0;
+	private boolean is_run = false;
     public void run()
 	{
 		while (true)
 		{
 			try {
 				
-				while(is_run==1) {
-                	model.simulate();
+				while(is_run) {
+					
+                	
                     textArea1.setText(model.getCarText());
                     textArea2.setText(model.getStationText());
                     textArea3.setText(model.getPlaceText());
                     Thread.sleep(1000);
+                    model.simulate();
             	}
 			}
 			catch (InterruptedException e)
@@ -56,18 +60,46 @@ public class MainViewer extends JFrame implements Runnable{
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            		if(is_run==0) {
-            			is_run=1;
+            		if(!is_run) {
+            			is_run = true;
             		Thread th = new Thread(t1);
             		th.start();
             		}
             		else {
-            			is_run=0;
+            			is_run = true;
             		}
+            }
+        });
+        
+        pauseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+        		if(!is_run) {
+        			is_run = true;
+        		Thread th = new Thread(t1);
+        		th.start();
+        		}
+        		else {
+        			is_run = false;
+        		}
+            	
+            }
+        });
+        
+        endButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	model = new SimulationModel(register);
+                textArea1.setText(model.getCarText());
+                textArea2.setText(model.getStationText());
+                textArea3.setText(model.getPlaceText());
+                is_run = false;
             }
         });
     }
 
+
+    
     public static void main(String[] args) {
         EFileDecoder decoder = new EFileDecoder();
         decoder.setConfigFile("lib" + File.separator + "NariEFormatReader.properties");
@@ -77,7 +109,6 @@ public class MainViewer extends JFrame implements Runnable{
             decoder.decodeEfile();
             MapObjRegister register = decoder.getObjRegister();
             MainViewer frame = new MainViewer(register);
-            Thread t1 = new Thread(frame);
             frame.setContentPane(frame.panelBase);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.pack();

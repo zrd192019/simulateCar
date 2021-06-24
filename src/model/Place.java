@@ -4,6 +4,8 @@ package model;
  * Place is the location of station, car or districts
  * @author Zhanghaoji
  * @date 2021.06.2021/6/21 22:22
+ * @author Zhengrundong
+ * @date 2021.06.2021/6/24 16:54
  */
 public class Place {
 

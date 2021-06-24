@@ -4,6 +4,8 @@ package model;
  * Car is short for "Electric Vehicle"
  * @author Zhanghaoji
  * @date 2021.06.2021/6/21 17:32
+ * @author Zhengrundong
+ * @date 2021.06.2021/6/24 16:22
  */
 public class Car {
 
