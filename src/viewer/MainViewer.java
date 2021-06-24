@@ -14,34 +14,42 @@ import java.io.File;
 /**
  * This is the main viewer of the program
  * @author Zhanghaoji
- * @date 2021.06.2021/6/21 20:54
+ * @date 2021/6/21 20:54
  * @author Zhengrundong
- * @date 2021.06.2021/6/24 20:58
+ * @date 2021/6/24 20:58
  */
 public class MainViewer extends JFrame implements Runnable{
-    SimulationModel model;
+
+    private SimulationModel model;
+
+    private boolean is_run = false;
 
     private JPanel panelBase; // all
+
     private JPanel panel1; // left up
+
     private JPanel panel2; // right up
+
     private JPanel panel3; // left down
+
     private JPanel panel4; // right down
+
     private JTextArea textArea1; // left down
+
     private JTextArea textArea2; // right up
+
     private JTextArea textArea3; // right down
-    private JButton playButton;
-    private JButton pauseButton;
-    private JButton endButton;
-	private boolean is_run = false;
-    public void run()
-	{
-		while (true)
-		{
+
+    private JButton playButton; // play button
+
+    private JButton pauseButton; // pause button
+
+    private JButton endButton; // end button
+
+    public void run() {
+		while(true) {
 			try {
-				
 				while(is_run) {
-					
-                	
                     textArea1.setText(model.getCarText());
                     textArea2.setText(model.getStationText());
                     textArea3.setText(model.getPlaceText());
@@ -49,8 +57,7 @@ public class MainViewer extends JFrame implements Runnable{
                     model.simulate();
             	}
 			}
-			catch (InterruptedException e)
-			{
+			catch(InterruptedException e) {
 				System.err.println(e);
 			}
 		}
@@ -60,14 +67,13 @@ public class MainViewer extends JFrame implements Runnable{
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            		if(!is_run) {
-            			is_run = true;
-            		Thread th = new Thread(t1);
-            		th.start();
-            		}
-            		else {
-            			is_run = true;
-            		}
+                if(!is_run) {
+                    is_run = true;
+                    Thread th = new Thread(t1);
+                    th.start();
+                } else {
+                    is_run = true;
+                }
             }
         });
         
@@ -76,10 +82,9 @@ public class MainViewer extends JFrame implements Runnable{
             public void actionPerformed(ActionEvent e) {
         		if(!is_run) {
         			is_run = true;
-        		Thread th = new Thread(t1);
-        		th.start();
-        		}
-        		else {
+        		    Thread th = new Thread(t1);
+        		    th.start();
+        		} else {
         			is_run = false;
         		}
             	
@@ -97,8 +102,6 @@ public class MainViewer extends JFrame implements Runnable{
             }
         });
     }
-
-
     
     public static void main(String[] args) {
         EFileDecoder decoder = new EFileDecoder();
@@ -129,7 +132,6 @@ public class MainViewer extends JFrame implements Runnable{
         }catch(Exception e){
             e.printStackTrace();
         }
-
     }
 
     public MainViewer(MapObjRegister register) {
@@ -256,7 +258,6 @@ public class MainViewer extends JFrame implements Runnable{
         scrollPane3.setViewportView(textArea3);
         setButton(register,this);
     }
-
 
 }
 

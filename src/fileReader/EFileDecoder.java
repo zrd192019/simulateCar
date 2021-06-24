@@ -16,11 +16,11 @@ public class EFileDecoder {
 	fileReader.FileReader4EFormat reader = new fileReader.FileReader4EFormat();
 	
 	private String ePath = null;
+
 	private String eFile = null;
 	
 	MapObjRegister obj = new MapObjRegister();
-	
-	
+
 	public MapObjRegister getObjRegister(){
 		return obj;
 	}
@@ -69,6 +69,5 @@ public class EFileDecoder {
 			tag = reader.readToNextTag();
 		}
 	}
-
 
 }

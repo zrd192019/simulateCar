@@ -5,7 +5,7 @@ import java.util.Vector;
 /**
  * Station is short for "Electric Vehicle Charging Station"
  * @author Zhanghaoji
- * @date 2021.06.2021/6/21 17:40
+ * @date 2021/6/21 17:40
  */
 public class Station {
 
@@ -18,9 +18,7 @@ public class Station {
     private Place place; // place of the station
 
     private Vector<Car> carInLine = new Vector<>(); // the waiting line of cars
-    
-    
-    
+
     private final double eps = 1e-2;
 
     public Station(String id, int number, double chargingSpeed, Place p) {
@@ -60,4 +58,5 @@ public class Station {
     public static void main(String[] args) {
 
     }
+
 }

@@ -50,6 +50,7 @@ public class Place {
     public void setY(double y) {
     	this.Y = y ;
     }
+
     public void setX(double x) {
     	this.X = x ;
     }

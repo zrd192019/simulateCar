@@ -60,13 +60,16 @@ public class Car {
     public Place getCurPlace() {
         return curPlace;
     }
+
     public void setCurPlace(double x,double y) {
     	this.curPlace.setX(x);
     	this.curPlace.setY(y);
     }
+
     public void setPower(double power) {
     	this.power = power;
     }
+
     public void setSpeed(double speed) {
     	this.speed = speed;
     }

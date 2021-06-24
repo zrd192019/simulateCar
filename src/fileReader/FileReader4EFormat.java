@@ -242,4 +242,5 @@ public class FileReader4EFormat {
 		String dataStarter = configPro.getProperty(DATALINESTARTER);
 		return str.startsWith(dataStarter);
 	}
+
 }

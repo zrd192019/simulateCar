@@ -8,6 +8,7 @@ import java.util.*;
  * using HashMap<String, HashMap<String, HashMap<String, String>>> data structure
  */
 public class MapObjRegister implements ObjRegister {
+
 	private HashMap<String, HashMap<String, Object>> dataMap = new HashMap<String, HashMap<String, Object>>();
 
 	@Override
@@ -42,7 +43,6 @@ public class MapObjRegister implements ObjRegister {
 		objMaps.put(objKey, objMap);
 		return true;
 	}
-
 
 	@Override
 	public boolean setDataObj(String objKey, Class objType, Object objMap) {
