@@ -13,15 +13,13 @@ import java.util.HashMap;
  */
 public class SimulationModel  {
 	
-	  private final int RUNNING = 0;
+    private final int RUNNING = 0;
 
-	  private final int CHARGING = 1;
+    private final int CHARGING = 1;
 
-	  private final int ARRIVED = 2;
+    private final int ARRIVED = 2;
 
-    private final double powerT = 25; //The power consumed per mile
-
-	  private final int FULL = 3;
+    private final int FULL = 3;
 	
     private final double powerT = 30;//The power consumed per mile
 	
@@ -37,8 +35,6 @@ public class SimulationModel  {
 
     private String placeText = ""; // place text to be displayed
 
-    private int state = RUNNING;
-    
     private void updateStationText() {
         String str = "充电站信息\n";
         str += "编号\t充电桩数量\t充电速度\t所在位置\n";
@@ -136,10 +132,8 @@ public class SimulationModel  {
         	 		 sta.removeACar(car);
         	 		stationMap.replace(String.valueOf(j),sta);
         	 		 }
-            	 carMovingStep(car,car.getCurPlace(), placeMap.get(car.getWorkPlaceID()));
-             }
-             
-             else if(powerT*dis>car.getPower()&&car.getState().equals("RUNNING")) {
+                 carMovingStep(car,car.getCurPlace(), placeMap.get(car.getWorkPlaceID()));
+             } else if(powerT*dis>car.getPower()&&car.getState().equals("RUNNING")) {
             	 double minDis = 40;
             	 String minId = null;
             	 for(int j = 1; stationMap.containsKey(String.valueOf(j)); ++j) {
@@ -157,9 +151,7 @@ public class SimulationModel  {
                     stationMap.replace(String.valueOf(j),sta);
                  }
             	 carMovingStep(car,car.getCurPlace(), stationMap.get(minId).getPlace());
-             }
-             
-             else if(powerT*dis>=car.getPower()&&car.getState().equals("CHARGING")) {
+             } else if(powerT*dis>=car.getPower()&&car.getState().equals("CHARGING")) {
             	 double minDis = 40;
             	 String minId = null;
             	 for(int j = 1; stationMap.containsKey(String.valueOf(j)); ++j) {
@@ -177,9 +169,7 @@ public class SimulationModel  {
                     stationMap.replace(String.valueOf(j),sta);
                  }
             	 carMovingStep(car,car.getCurPlace(), stationMap.get(minId).getPlace());
-             }
-
-             else if(powerT*dis>=car.getPower()&&car.getState().equals("FULL")) {
+             } else if(powerT*dis>=car.getPower()&&car.getState().equals("FULL")) {
             	 double minDis = 40;
             	 String minId = null;
             	 for(int j = 1; stationMap.containsKey(String.valueOf(j)); ++j) {
@@ -203,27 +193,6 @@ public class SimulationModel  {
              updateStationText();
          }
     }
-
-    public void carMovingStep(Car car,Place present,Place destination,int state) {
-        if(state==RUNNING) {
-             if(car.getCurPlace().getX()<placeMap.get(car.getWorkPlaceID()).getX()) {
-                 car.setCurPlace(car.getCurPlace().getX()+1,car.getCurPlace().getY());
-                 car.setPower(car.getPower()-powerT);
-             } else if(car.getCurPlace().getX()>placeMap.get(car.getWorkPlaceID()).getX()) {
-                 car.setCurPlace(car.getCurPlace().getX()-1,car.getCurPlace().getY());
-                 car.setPower(car.getPower()-powerT);
-             } else if(car.getCurPlace().getY()<placeMap.get(car.getWorkPlaceID()).getY()){
-                 car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()+1);
-                 car.setPower(car.getPower()-powerT);
-             } else if(car.getCurPlace().getY()>placeMap.get(car.getWorkPlaceID()).getY()){
-                 car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()-1);
-                 car.setPower(car.getPower()-powerT);
-             } else
-                 car.setSpeed(0);
-        }  else if(state==CHARGING){
-             car.setSpeed(0);
-             car.setPower(car.getPower()+powerT);
-        }
     
     public void carMovingStep(Car car,Place present,Place destination) {
         if( car.getState().equals("RUNNING")) {
@@ -243,7 +212,7 @@ public class SimulationModel  {
                 car.setSpeed(0);
                 car.setState("ARRIVED");
             }
-		    } else if(car.getState().equals("CHARGING")){
+        } else if(car.getState().equals("CHARGING")){
             car.setSpeed(0);
             if(car.getPower()+powerT<car.getCapacity())
                 car.setPower(car.getPower()+powerT);
@@ -254,8 +223,8 @@ public class SimulationModel  {
                     sta.removeACar(car);
                     stationMap.replace(String.valueOf(j),sta);
                 }
-		        }
-	      }
+            }
+        }
     }
 
     public HashMap<String, Place> getPlaceMap() {
@@ -273,4 +242,6 @@ public class SimulationModel  {
     public String getPlaceText() {
         return placeText;
     }
+
 }
+
