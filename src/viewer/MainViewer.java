@@ -14,90 +14,92 @@ import java.io.File;
 /**
  * This is the main viewer of the program
  * @author Zhanghaoji
- * @date 2021.06.2021/6/21 20:54
+ * @date 2021/6/21 20:54
  * @author Zhengrundong
- * @date 2021.06.2021/6/24 20:58
+ * @date 2021/6/24 20:58
  */
 public class MainViewer extends JFrame implements Runnable{
-    SimulationModel model;
+
+    private SimulationModel model;
+
+    private boolean is_run = false;
 
     private JPanel panelBase; // all
-    private JPanel panel1; // left up
-    private JPanel panel2; // right up
-    private JPanel panel3; // left down
-    private JPanel panel4; // right down
-    private JTextArea textArea1; // left down
-    private JTextArea textArea2; // right up
-    private JTextArea textArea3; // right down
-    private JButton playButton;
-    private JButton pauseButton;
-    private JButton endButton;
-	private boolean is_run = false;
-	 public void run()
-		{
-			while (true)
-			{
-				synchronized (this) {
-				try {
-					while(is_run) {
-	                    textArea1.setText(model.getCarText());
-	                    textArea2.setText(model.getStationText());
-	                    textArea3.setText(model.getPlaceText());
-	                    Thread.sleep(1000);
-	                    model.simulate();
-	            	}
-				}
-				catch (InterruptedException e)
-				{
-					System.err.println(e);
-				}
-			}
-				}
-		}
-	    
-	    private void setButton(MapObjRegister register,MainViewer t1) {
-	        playButton.addActionListener(new ActionListener() {
-	            @Override
-	            public void actionPerformed(ActionEvent e) {
-	            		if(!is_run) {
-	            			is_run = true;
-	            		Thread th = new Thread(t1);
-	            		th.start();
-	            		}
-	            		else {
-	            			is_run = true;
-	            		}
-	            }
-	        });
-	        
-	        pauseButton.addActionListener(new ActionListener() {
-	            @Override
-	            public void actionPerformed(ActionEvent e) {
-	        		if(!is_run) {
-	        			is_run = true;
-	        		Thread th = new Thread(t1);
-	        		th.start();
-	        		}
-	        		else {
-	        			is_run = false;
-	        		}
-	            	
-	            }
-	        });
-	        
-	        endButton.addActionListener(new ActionListener() {
-	            @Override
-	            public void actionPerformed(ActionEvent e) {
-	            	model = new SimulationModel(register);
-	                textArea1.setText(model.getCarText());
-	                textArea2.setText(model.getStationText());
-	                textArea3.setText(model.getPlaceText());
-	                is_run = false;
-	        		
-	            }
-	        });
-	    }
 
+    private JPanel panel1; // left up
+
+    private JPanel panel2; // right up
+
+    private JPanel panel3; // left down
+
+    private JPanel panel4; // right down
+
+    private JTextArea textArea1; // left down
+
+    private JTextArea textArea2; // right up
+
+    private JTextArea textArea3; // right down
+
+    private JButton playButton; // play button
+
+    private JButton pauseButton; // pause button
+
+    private JButton endButton; // end button
+
+    public void run() {
+        while(true) {
+            try {
+                while(is_run) {
+                    textArea1.setText(model.getCarText());
+                    textArea2.setText(model.getStationText());
+                    textArea3.setText(model.getPlaceText());
+                    Thread.sleep(1000);
+                    model.simulate();
+                }
+            } catch(InterruptedException e) {
+                System.err.println(e);
+				    }
+		    }
+		}
+    
+    private void setButton(MapObjRegister register,MainViewer t1) {
+        playButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(!is_run) {
+                    is_run = true;
+                    Thread th = new Thread(t1);
+                    th.start();
+                } else {
+                    is_run = true;
+                }
+            }
+        });
+        
+        pauseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(!is_run) {
+                    is_run = true;
+                    Thread th = new Thread(t1);
+                    th.start();
+                } else {
+                    is_run = false;
+                }
+            }
+        });
+        
+        endButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	  model = new SimulationModel(register);
+                textArea1.setText(model.getCarText());
+                textArea2.setText(model.getStationText());
+                textArea3.setText(model.getPlaceText());
+                is_run = false;
+            }
+        });
+    }
     
     public static void main(String[] args) {
         EFileDecoder decoder = new EFileDecoder();
@@ -128,7 +130,6 @@ public class MainViewer extends JFrame implements Runnable{
         }catch(Exception e){
             e.printStackTrace();
         }
-
     }
 
     public MainViewer(MapObjRegister register) {
@@ -256,6 +257,4 @@ public class MainViewer extends JFrame implements Runnable{
         setButton(register,this);
     }
 
-
 }
-

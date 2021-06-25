@@ -15,10 +15,12 @@ import java.util.HashMap;
  * drawn by Graphics2D
  * static picture
  * @author Zhanghaoji
- * @date 2021.06.2021/6/21 20:54
+ * @date 2021/6/21 20:54
  */
 class DisplayPanel extends JPanel {
+
     private HashMap<String, Place> placeMap;
+
     private final int offset = 200;
 
     public DisplayPanel(HashMap pm) {
@@ -95,4 +97,5 @@ class DisplayPanel extends JPanel {
             e.printStackTrace();
         }
     }
+
 }

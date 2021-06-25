@@ -7,20 +7,21 @@ import java.util.HashMap;
 /**
  * Simulation Model is the main model of the simulation
  * @author Zhanghaoji
- * @date 2021.06.2021/6/23 11:59
+ * @date 2021/6/23 11:59
  * @author Zhengrundong
- * @date 2021.06.2021/6/24 20:57
+ * @date 2021/6/24 20:57
  */
 public class SimulationModel  {
 	
-	private final int RUNNING = 0;
-	
-	private final int CHARGING = 1;
-	
-	private final int ARRIVED = 2;
-	
-	private final int FULL = 3;
-	
+	  private final int RUNNING = 0;
+
+	  private final int CHARGING = 1;
+
+	  private final int ARRIVED = 2;
+
+    private final double powerT = 25; //The power consumed per mile
+
+	  private final int FULL = 3;
 	
     private final double powerT = 30;//The power consumed per mile
 	
@@ -36,6 +37,7 @@ public class SimulationModel  {
 
     private String placeText = ""; // place text to be displayed
 
+    private int state = RUNNING;
     
     private void updateStationText() {
         String str = "充电站信息\n";
@@ -122,7 +124,6 @@ public class SimulationModel  {
     /**
      * simulate data
      */
-    
     public void simulate() {
     	 for(int i = 1; carMap.containsKey(String.valueOf(i)); i++) {
              Car car = carMap.get(String.valueOf(i));
@@ -202,52 +203,61 @@ public class SimulationModel  {
              updateStationText();
          }
     }
-    
+
+    public void carMovingStep(Car car,Place present,Place destination,int state) {
+        if(state==RUNNING) {
+             if(car.getCurPlace().getX()<placeMap.get(car.getWorkPlaceID()).getX()) {
+                 car.setCurPlace(car.getCurPlace().getX()+1,car.getCurPlace().getY());
+                 car.setPower(car.getPower()-powerT);
+             } else if(car.getCurPlace().getX()>placeMap.get(car.getWorkPlaceID()).getX()) {
+                 car.setCurPlace(car.getCurPlace().getX()-1,car.getCurPlace().getY());
+                 car.setPower(car.getPower()-powerT);
+             } else if(car.getCurPlace().getY()<placeMap.get(car.getWorkPlaceID()).getY()){
+                 car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()+1);
+                 car.setPower(car.getPower()-powerT);
+             } else if(car.getCurPlace().getY()>placeMap.get(car.getWorkPlaceID()).getY()){
+                 car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()-1);
+                 car.setPower(car.getPower()-powerT);
+             } else
+                 car.setSpeed(0);
+        }  else if(state==CHARGING){
+             car.setSpeed(0);
+             car.setPower(car.getPower()+powerT);
+        }
     
     public void carMovingStep(Car car,Place present,Place destination) {
-    if( car.getState().equals("RUNNING")) {
-   	 if(car.getCurPlace().getX()<placeMap.get(car.getWorkPlaceID()).getX()) {
-		 car.setCurPlace(car.getCurPlace().getX()+1,car.getCurPlace().getY());
-		 car.setPower(car.getPower()-powerT);
-	 }
-	 else if(car.getCurPlace().getX()>placeMap.get(car.getWorkPlaceID()).getX()) {
-		 car.setCurPlace(car.getCurPlace().getX()-1,car.getCurPlace().getY());
-		 car.setPower(car.getPower()-powerT);
-	 }
-	 else if(car.getCurPlace().getY()<placeMap.get(car.getWorkPlaceID()).getY()){
-		 car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()+1);
-		 car.setPower(car.getPower()-powerT);
-	 }
-		
-	 else if(car.getCurPlace().getY()>placeMap.get(car.getWorkPlaceID()).getY()){
-		 car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()-1);
-		 car.setPower(car.getPower()-powerT);
-	 }
-	 else {
-		 car.setSpeed(0);
-		 car.setState("ARRIVED");
-	 }
-		 
+        if( car.getState().equals("RUNNING")) {
+            if(car.getCurPlace().getX()<placeMap.get(car.getWorkPlaceID()).getX()) {
+                car.setCurPlace(car.getCurPlace().getX()+1,car.getCurPlace().getY());
+                car.setPower(car.getPower()-powerT);
+            } else if(car.getCurPlace().getX()>placeMap.get(car.getWorkPlaceID()).getX()) {
+                car.setCurPlace(car.getCurPlace().getX()-1,car.getCurPlace().getY());
+                car.setPower(car.getPower()-powerT);
+            } else if(car.getCurPlace().getY()<placeMap.get(car.getWorkPlaceID()).getY()){
+                car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()+1);
+                car.setPower(car.getPower()-powerT);
+            } else if(car.getCurPlace().getY()>placeMap.get(car.getWorkPlaceID()).getY()){
+                car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()-1);
+                car.setPower(car.getPower()-powerT);
+            } else {
+                car.setSpeed(0);
+                car.setState("ARRIVED");
+            }
+		    } else if(car.getState().equals("CHARGING")){
+            car.setSpeed(0);
+            if(car.getPower()+powerT<car.getCapacity())
+                car.setPower(car.getPower()+powerT);
+            else {
+                car.setState("FULL");
+                for(int j = 1; stationMap.containsKey(String.valueOf(j)); j++) {
+                    Station sta = stationMap.get(String.valueOf(j));
+                    sta.removeACar(car);
+                    stationMap.replace(String.valueOf(j),sta);
+                }
+		        }
+	      }
     }
-     
-	else if(car.getState().equals("CHARGING")){
-		 car.setSpeed(0);
-		 if(car.getPower()+powerT<car.getCapacity())
-			 car.setPower(car.getPower()+powerT);
-		 else {
-			 car.setState("FULL");
-    	 	 for(int j = 1; stationMap.containsKey(String.valueOf(j)); j++) {
-    	 		 Station sta = stationMap.get(String.valueOf(j));
-    	 		 sta.removeACar(car);
-    	 		stationMap.replace(String.valueOf(j),sta);
-         }
-		     
-	 }
-	 }
-    
-    }
-    
-    
+
     public HashMap<String, Place> getPlaceMap() {
         return placeMap;
     }
