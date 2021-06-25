@@ -21,11 +21,11 @@ class DisplayPanel extends JPanel {
 
     private HashMap<String, Place> placeMap;
 
-    private final int offset = 200;
+    private final int offset = 280;
 
     public DisplayPanel(HashMap pm) {
         placeMap = pm;
-        this.setSize(600, 600);
+        this.setSize(800, 600);
     }
 
     private void drawHome(Graphics2D g2d, double x, double y) {

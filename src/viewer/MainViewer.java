@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.rmi.RemoteException;
 
 
 /**
@@ -49,21 +50,31 @@ public class MainViewer extends JFrame implements Runnable{
 
     private JButton modifyButton; // modify info.txt
 
+    private JButton refreshButton; // refresh info.txt
+
+    private JButton rateButton; // change the rate of displaying
+
+    private int clockCount = 0;
+
+    private int rate = 1;
+
     public void run() {
         while(true) {
             try {
                 while(is_run) {
-                    textArea1.setText(model.getCarText());
+                    textArea1.setText("已经运行" + clockCount + "h\n" + model.getCarText());
                     textArea2.setText(model.getStationText());
                     textArea3.setText(model.getPlaceText());
-                    Thread.sleep(1000);
+                    Thread.sleep(1000 / rate);
+                    clockCount++;
                     model.simulate();
                 }
             } catch(InterruptedException e) {
                 System.err.println(e);
-				    }
-		    }
-		}
+                break;
+            }
+        }
+    }
     
     private void setButton(MapObjRegister register,MainViewer t1) {
         playButton.addActionListener(new ActionListener() {
@@ -94,7 +105,8 @@ public class MainViewer extends JFrame implements Runnable{
             @Override
             public void actionPerformed(ActionEvent e) {
                 model = new SimulationModel(register);
-                textArea1.setText(model.getCarText());
+                clockCount = 0;
+                textArea1.setText("已经运行" + clockCount + "h\n" + model.getCarText());
                 textArea2.setText(model.getStationText());
                 textArea3.setText(model.getPlaceText());
                 is_run = false;
@@ -108,6 +120,38 @@ public class MainViewer extends JFrame implements Runnable{
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
+            }
+        });
+        MainViewer This = this;
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                EFileDecoder decoder = new EFileDecoder();
+                decoder.setConfigFile("lib" + File.separator + "NariEFormatReader.properties");
+                decoder.setEPath(System.getProperty("user.dir"));
+                decoder.setEFile("lib" + File.separator + "info.txt");
+                try {
+                    This.setVisible(false);
+                    decoder.decodeEfile();
+                    MapObjRegister register = decoder.getObjRegister();
+                    MainViewer frame = new MainViewer(register);
+                    frame.setContentPane(frame.panelBase);
+                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    frame.pack();
+                    frame.setSize(1800, 830 + 28);
+                    frame.setResizable(false);
+                    frame.setLocationRelativeTo(null);
+                    frame.setVisible(true);
+                } catch (RemoteException remoteException) {
+                    remoteException.printStackTrace();
+                }
+            }
+        });
+        rateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                rate = (rate % 5) + 1;
+                rateButton.setText("切换模拟速度：" + rate);
             }
         });
     }
@@ -124,7 +168,7 @@ public class MainViewer extends JFrame implements Runnable{
             frame.setContentPane(frame.panelBase);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.pack();
-            frame.setSize(1400, 800 + 28);
+            frame.setSize(1800, 830 + 28);
             frame.setResizable(false);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
@@ -154,19 +198,16 @@ public class MainViewer extends JFrame implements Runnable{
          * -------------------
          */
         panelBase = new JPanel();
-        panelBase.setLayout(new GridBagLayout());
+        panelBase.setLayout(new GridLayout(2, 3));
 
         /**
          * panel 1 at (0, 0)
          */
         panel1 = new DisplayPanel(model.getPlaceMap());
-        panel1.setLayout(new GridBagLayout());
-        GridBagConstraints gbc;
-        gbc = new GridBagConstraints();
+        GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
+        gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
         panelBase.add(panel1, gbc);
 
@@ -174,23 +215,14 @@ public class MainViewer extends JFrame implements Runnable{
          * panel 2 at (1, 0)
          */
         panel2 = new JPanel();
-        panel2.setLayout(new GridBagLayout());
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
+        panel2.setLayout(new GridLayout());
+        gbc.gridx = 2;
         gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         panelBase.add(panel2, gbc);
 
         final JScrollPane scrollPane1 = new JScrollPane();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        panel2.add(scrollPane1, gbc);
+        panel2.add(scrollPane1);
 
         textArea2 = new JTextArea();
         scrollPane1.setViewportView(textArea2);
@@ -203,6 +235,7 @@ public class MainViewer extends JFrame implements Runnable{
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.gridwidth = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
@@ -232,6 +265,14 @@ public class MainViewer extends JFrame implements Runnable{
         modifyButton.setText("修改配置文件");
         toolBar1.add(modifyButton);
 
+        refreshButton = new JButton();
+        refreshButton.setText("刷新配置文件");
+        toolBar1.add(refreshButton);
+
+        rateButton = new JButton();
+        rateButton.setText("切换模拟速度：" + rate);
+        toolBar1.add(rateButton);
+
         final JScrollPane scrollPane2 = new JScrollPane();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -248,27 +289,20 @@ public class MainViewer extends JFrame implements Runnable{
          * panel 4 at (1, 1)
          */
         panel4 = new JPanel();
-        panel4.setLayout(new GridBagLayout());
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
+        panel4.setLayout(new GridLayout());
+        gbc.gridx = 2;
         gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        panelBase.add(panel4, gbc);
+        panelBase.add(panel4);
 
         final JScrollPane scrollPane3 = new JScrollPane();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        panel4.add(scrollPane3, gbc);
+        panel4.add(scrollPane3);
 
         textArea3 = new JTextArea();
-        textArea3.setText("");
         scrollPane3.setViewportView(textArea3);
+
+
+
         setButton(register,this);
     }
 
