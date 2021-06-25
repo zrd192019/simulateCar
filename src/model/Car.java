@@ -76,10 +76,13 @@ public class Car {
     public void setSpeed(double speed) {
     	this.speed = speed;
     }
+
     public void setState(String state) {
     	this.state=state;
     }
+
     public String getState() {
     	return state;
     }
+
 }
