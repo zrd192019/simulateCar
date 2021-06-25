@@ -53,11 +53,25 @@ public class Station {
     public boolean addACar(Car car) {
         if(Place.getDistanceOf(car.getCurPlace(), place) > eps)
             return false;
+        for(int i=0;i<carInLine.size();i++) {
+        	if(carInLine.get(i).getId()==car.getId()) {
+        		return false;
+        	}
+        }
         carInLine.add(car);
         return true;
     }
-
-    public static void main(String[] args) {
-
+    
+    public boolean removeACar(Car car) {
+        if(Place.getDistanceOf(car.getCurPlace(), place) > eps)
+            return false;
+        for(int i=0;i<carInLine.size();i++) {
+        	if(carInLine.get(i).getId()==car.getId()) {
+        		carInLine.remove(i);
+        		return true;
+        	}
+        }
+        return false;
     }
+
 }

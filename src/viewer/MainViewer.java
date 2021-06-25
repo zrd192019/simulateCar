@@ -33,71 +33,70 @@ public class MainViewer extends JFrame implements Runnable{
     private JButton pauseButton;
     private JButton endButton;
 	private boolean is_run = false;
-    public void run()
-	{
-		while (true)
+	 public void run()
 		{
-			try {
-				
-				while(is_run) {
-					
-                	
-                    textArea1.setText(model.getCarText());
-                    textArea2.setText(model.getStationText());
-                    textArea3.setText(model.getPlaceText());
-                    Thread.sleep(1000);
-                    model.simulate();
-            	}
-			}
-			catch (InterruptedException e)
+			while (true)
 			{
-				System.err.println(e);
+				synchronized (this) {
+				try {
+					while(is_run) {
+	                    textArea1.setText(model.getCarText());
+	                    textArea2.setText(model.getStationText());
+	                    textArea3.setText(model.getPlaceText());
+	                    Thread.sleep(1000);
+	                    model.simulate();
+	            	}
+				}
+				catch (InterruptedException e)
+				{
+					System.err.println(e);
+				}
 			}
+				}
 		}
-	}
-    
-    private void setButton(MapObjRegister register,MainViewer t1) {
-        playButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            		if(!is_run) {
-            			is_run = true;
-            		Thread th = new Thread(t1);
-            		th.start();
-            		}
-            		else {
-            			is_run = true;
-            		}
-            }
-        });
-        
-        pauseButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-        		if(!is_run) {
-        			is_run = true;
-        		Thread th = new Thread(t1);
-        		th.start();
-        		}
-        		else {
-        			is_run = false;
-        		}
-            	
-            }
-        });
-        
-        endButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	model = new SimulationModel(register);
-                textArea1.setText(model.getCarText());
-                textArea2.setText(model.getStationText());
-                textArea3.setText(model.getPlaceText());
-                is_run = false;
-            }
-        });
-    }
-
+	    
+	    private void setButton(MapObjRegister register,MainViewer t1) {
+	        playButton.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	            		if(!is_run) {
+	            			is_run = true;
+	            		Thread th = new Thread(t1);
+	            		th.start();
+	            		}
+	            		else {
+	            			is_run = true;
+	            		}
+	            }
+	        });
+	        
+	        pauseButton.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	        		if(!is_run) {
+	        			is_run = true;
+	        		Thread th = new Thread(t1);
+	        		th.start();
+	        		}
+	        		else {
+	        			is_run = false;
+	        		}
+	            	
+	            }
+	        });
+	        
+	        endButton.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	            	model = new SimulationModel(register);
+	                textArea1.setText(model.getCarText());
+	                textArea2.setText(model.getStationText());
+	                textArea3.setText(model.getPlaceText());
+	                is_run = false;
+	        		
+	            }
+	        });
+	    }
 
     
     public static void main(String[] args) {
