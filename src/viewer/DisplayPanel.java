@@ -21,7 +21,7 @@ class DisplayPanel extends JPanel {
 
     private HashMap<String, Place> placeMap;
 
-    private final int offset = 300;
+    private final int offset = 280;
 
     public DisplayPanel(HashMap pm) {
         placeMap = pm;
