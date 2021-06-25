@@ -47,21 +47,20 @@ public class MainViewer extends JFrame implements Runnable{
     private JButton endButton; // end button
 
     public void run() {
-		while(true) {
-			try {
-				while(is_run) {
+        while(true) {
+            try {
+                while(is_run) {
                     textArea1.setText(model.getCarText());
                     textArea2.setText(model.getStationText());
                     textArea3.setText(model.getPlaceText());
                     Thread.sleep(1000);
                     model.simulate();
-            	}
-			}
-			catch(InterruptedException e) {
-				System.err.println(e);
-			}
+                }
+            } catch(InterruptedException e) {
+                System.err.println(e);
+				    }
+		    }
 		}
-	}
     
     private void setButton(MapObjRegister register,MainViewer t1) {
         playButton.addActionListener(new ActionListener() {
@@ -80,21 +79,20 @@ public class MainViewer extends JFrame implements Runnable{
         pauseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-        		if(!is_run) {
-        			is_run = true;
-        		    Thread th = new Thread(t1);
-        		    th.start();
-        		} else {
-        			is_run = false;
-        		}
-            	
+                if(!is_run) {
+                    is_run = true;
+                    Thread th = new Thread(t1);
+                    th.start();
+                } else {
+                    is_run = false;
+                }
             }
         });
         
         endButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	model = new SimulationModel(register);
+            	  model = new SimulationModel(register);
                 textArea1.setText(model.getCarText());
                 textArea2.setText(model.getStationText());
                 textArea3.setText(model.getPlaceText());
@@ -260,4 +258,3 @@ public class MainViewer extends JFrame implements Runnable{
     }
 
 }
-

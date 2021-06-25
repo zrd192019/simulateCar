@@ -22,6 +22,8 @@ public class Car {
     private String workPlaceID; // nearly everyday needs to go work
 
     private Place curPlace; // current place of the car
+    
+    private String state;
 
     public Car(String id, double capacity, double speed, String homePlaceID, String workPlaceID, Place curPlace) {
         this.id = id;
@@ -31,6 +33,7 @@ public class Car {
         this.homePlaceID = homePlaceID;
         this.workPlaceID = workPlaceID;
         this.curPlace = curPlace;
+        this.state="RUNNING";
     }
 
     public String getId() {
@@ -73,5 +76,10 @@ public class Car {
     public void setSpeed(double speed) {
     	this.speed = speed;
     }
-    
+    public void setState(String state) {
+    	this.state=state;
+    }
+    public String getState() {
+    	return state;
+    }
 }
