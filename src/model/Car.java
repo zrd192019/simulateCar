@@ -15,7 +15,9 @@ public class Car {
 
     private double power; // remaining power, unit: km
 
-    private double speed; // speed of driving, unit: km/h
+    private double maxSpeed; // maximum speed, unit: km/h
+
+    private double curSpeed; // current speed, unit: km/h
 
     private String homePlaceID; // everyday needs to go home
 
@@ -29,32 +31,16 @@ public class Car {
 
     private Place finalDestination;
 
-    public Car(String id, double capacity, double speed, String homePlaceID, String workPlaceID, Place curPlace) {
+    public Car(String id, double capacity, double maxSpeed, String homePlaceID, String workPlaceID, Place curPlace) {
         this.id = id;
         this.capacity = capacity;
         this.power = capacity;
-        this.speed = speed;
+        this.maxSpeed = maxSpeed;
+        this.curSpeed = this.maxSpeed;
         this.homePlaceID = homePlaceID;
         this.workPlaceID = workPlaceID;
         this.curPlace = curPlace;
         this.state="RUNNING";
-
-    }
-
-    public void setDestination(Place destination) {
-        this.destination=destination;
-    }
-
-    public Place getDestination() {
-        return destination;
-    }
-
-    public void setFinalDestination(Place finDes) {
-        this.finalDestination =finDes;
-    }
-
-    public Place getFinalDestination() {
-        return finalDestination;
     }
 
     public String getId() {
@@ -69,8 +55,12 @@ public class Car {
         return power;
     }
 
-    public double getSpeed() {
-        return speed;
+    public double getMaxSpeed() {
+        return maxSpeed;
+    }
+
+    public double getCurSpeed() {
+        return curSpeed;
     }
 
     public String  getHomePlaceID() {
@@ -85,24 +75,41 @@ public class Car {
         return curPlace;
     }
 
-    public void setCurPlace(double x,double y) {
-        this.curPlace.setX(x);
-        this.curPlace.setY(y);
+    public String getState() {
+        return state;
+    }
+
+    public Place getDestination() {
+        return destination;
+    }
+
+    public Place getFinalDestination() {
+        return finalDestination;
     }
 
     public void setPower(double power) {
         this.power = power;
     }
 
-    public void setSpeed(double speed) {
-        this.speed = speed;
+    public void setCurSpeed(double curSpeed) {
+        this.curSpeed = curSpeed;
+    }
+
+    public void setCurPlace(double x,double y) {
+        this.curPlace.setX(x);
+        this.curPlace.setY(y);
     }
 
     public void setState(String state) {
         this.state=state;
     }
 
-    public String getState() {
-        return state;
+    public void setDestination(Place destination) {
+        this.destination=destination;
     }
+
+    public void setFinalDestination(Place finDes) {
+        this.finalDestination =finDes;
+    }
+
 }

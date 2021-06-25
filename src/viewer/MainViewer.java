@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -46,6 +47,8 @@ public class MainViewer extends JFrame implements Runnable{
 
     private JButton endButton; // end button
 
+    private JButton modifyButton; // modify info.txt
+
     public void run() {
         while(true) {
             try {
@@ -75,7 +78,6 @@ public class MainViewer extends JFrame implements Runnable{
                 }
             }
         });
-        
         pauseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -88,15 +90,24 @@ public class MainViewer extends JFrame implements Runnable{
                 }
             }
         });
-        
         endButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	  model = new SimulationModel(register);
+                model = new SimulationModel(register);
                 textArea1.setText(model.getCarText());
                 textArea2.setText(model.getStationText());
                 textArea3.setText(model.getPlaceText());
                 is_run = false;
+            }
+        });
+        modifyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Desktop.getDesktop().open(new File("lib" + File.separator + "info.txt"));
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
         });
     }
@@ -216,6 +227,10 @@ public class MainViewer extends JFrame implements Runnable{
         endButton = new JButton();
         endButton.setText("停止模拟");
         toolBar1.add(endButton);
+
+        modifyButton = new JButton();
+        modifyButton.setText("修改配置文件");
+        toolBar1.add(modifyButton);
 
         final JScrollPane scrollPane2 = new JScrollPane();
         gbc = new GridBagConstraints();

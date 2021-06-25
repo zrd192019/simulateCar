@@ -21,8 +21,6 @@ public class SimulationModel  {
 
     private final int FULL = 3;
 
-    private final double powerT = 10;//The power consumed per mile
-
     private HashMap<String, Place> placeMap = new HashMap<>(); // all places
 
     private HashMap<String, Car> carMap = new HashMap<>(); // all cars
@@ -52,7 +50,7 @@ public class SimulationModel  {
         for(int i = 1; carMap.containsKey(String.valueOf(i)); ++i) {
             Car car = carMap.get(String.valueOf(i));
             str += String.format("%s\t%.0f/%.0f\t%.0f\t(%.0f,%.0f)\t%s\t%s\t%s\t(%.0f,%.0f)\t(%.0f,%.0f)\n", car.getId(), car.getPower(), car.getCapacity(),
-                    car.getSpeed(), car.getCurPlace().getX(), car.getCurPlace().getY(), car.getHomePlaceID(), car.getWorkPlaceID(),car.getState(), car.getDestination().getX(), car.getDestination().getY(), car.getFinalDestination().getX(), car.getFinalDestination().getY());
+                    car.getCurSpeed(), car.getCurPlace().getX(), car.getCurPlace().getY(), car.getHomePlaceID(), car.getWorkPlaceID(),car.getState(), car.getDestination().getX(), car.getDestination().getY(), car.getFinalDestination().getX(), car.getFinalDestination().getY());
         }
         carText = str;
     }
@@ -133,41 +131,42 @@ public class SimulationModel  {
                 Station sta = stationMap2.get(String.valueOf(j));
                 Place p = sta.getPlace();
                 double disS = Place.getDistanceOf(p,car.getFinalDestination());
-                if(maxDis<disS) {
+                if(maxDis < disS) {
                     maxDis = disS;
                 }
             }
 
-            if(car.getPower()>=powerT*(maxDis+dis)&&car.getState().equals("RUNNING")) {
-                car.setDestination(car.getFinalDestination());
-                carMovingStep(car,car.getCurPlace(), car.getFinalDestination());
-            }
-
-            else if(car.getState().equals("RUNNING")) {
+            Place curPlace = car.getCurPlace();
+            Place finalDestination = car.getFinalDestination();
+            if(car.getPower() >= maxDis + dis && car.getState().equals("RUNNING")) {
+                car.setDestination(finalDestination);
+                carMovingStep(car, curPlace, finalDestination);
+            } else if(car.getState().equals("RUNNING")) {
                 double minDis = 100;
                 Place destination = null;
                 for(int j = 1; stationMap2.containsKey(String.valueOf(j)); ++j) {
                     Station sta = stationMap.get(String.valueOf(j));
                     Place p = sta.getPlace();
-                    double disTemp = Place.getDistanceOf(car.getCurPlace(),p);
-                    double disS = Place.getDistanceOf(car.getCurPlace(),car.getFinalDestination())- Place.getDistanceOf(p,car.getFinalDestination());
-                    if(p.getX()==car.getDestination().getX()&&p.getY()==car.getDestination().getY()&&disS>=0&&sta.getLineSize()<sta.getNumber()) {
+                    double disS = Place.getDistanceOf(curPlace, finalDestination) - Place.getDistanceOf(p, finalDestination);
+                    if(p.getX() == car.getDestination().getX() && p.getY() == car.getDestination().getY() && disS >= 0 && sta.getLineSize() < sta.getNumber()) {
                         destination = p;
+                        break;
                     }
                 }
-                if(destination!=null) {
+                if(destination != null) {
                     car.setDestination(destination);
                 } else {
                     for(int j = 1; stationMap2.containsKey(String.valueOf(j)); ++j) {
                         Station sta = stationMap.get(String.valueOf(j));
                         Place p = sta.getPlace();
-                        double disTemp = Place.getDistanceOf(car.getCurPlace(),p);
-                        double disS = Place.getDistanceOf(car.getCurPlace(),car.getFinalDestination())- Place.getDistanceOf(p,car.getFinalDestination());
-                        if(disS>=0&&sta.getLineSize()<sta.getNumber()&&powerT* Place.getDistanceOf(p,car.getCurPlace())<car.getPower()) {
+                        double disTemp = Place.getDistanceOf(curPlace, p);
+                        double disS = Place.getDistanceOf(curPlace, finalDestination) - Place.getDistanceOf(p, finalDestination);
+                        if(disS >= 0 && sta.getLineSize() < sta.getNumber() && disTemp <= car.getPower()) {
                             car.setDestination(p);
                             break;
-                        } else if(powerT* Place.getDistanceOf(p,car.getCurPlace())<car.getPower()&&sta.getLineSize()<sta.getNumber()&&disTemp<minDis) {
+                        } else if(disTemp < car.getPower() && sta.getLineSize() < sta.getNumber() && disTemp < minDis) {
                             car.setDestination(p);
+                            minDis = disTemp;
                         }
                     }
                 }
@@ -183,56 +182,76 @@ public class SimulationModel  {
 
     public void carMovingStep(Car car,Place present,Place destination) {
         if(car.getState().equals("RUNNING")) {
-            car.setSpeed(40);
-            if(car.getCurPlace().getX()<car.getDestination().getX()) {
-                car.setCurPlace(car.getCurPlace().getX()+1,car.getCurPlace().getY());
-                car.setPower(car.getPower()-powerT);
-            } else if(car.getCurPlace().getX()>car.getDestination().getX()) {
-                car.setCurPlace(car.getCurPlace().getX()-1,car.getCurPlace().getY());
-                car.setPower(car.getPower()-powerT);
-            } else if(car.getCurPlace().getY()<car.getDestination().getY()){
-                car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()+1);
-                car.setPower(car.getPower()-powerT);
-            } else if(car.getCurPlace().getY()>car.getDestination().getY()){
-                car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY()-1);
-                car.setPower(car.getPower()-powerT);
-            } else {
-                car.setSpeed(0);
+            double speed = car.getMaxSpeed();
+            car.setCurSpeed(speed);
+            if(car.getCurPlace().getX() < car.getDestination().getX()) {
+                double dis = Math.min(speed, car.getDestination().getX() - car.getCurPlace().getX());
+                dis = Math.min(dis, car.getPower());
+                car.setCurPlace(car.getCurPlace().getX() + dis,car.getCurPlace().getY());
+                car.setPower(car.getPower() - dis);
+            } else if(car.getCurPlace().getX() > car.getDestination().getX()) {
+                double dis = Math.min(speed, car.getCurPlace().getX() - car.getDestination().getX());
+                dis = Math.min(dis, car.getPower());
+                car.setCurPlace(car.getCurPlace().getX() - dis,car.getCurPlace().getY());
+                car.setPower(car.getPower() - dis);
+            } else if(car.getCurPlace().getY() < car.getDestination().getY()){
+                double dis = Math.min(speed, car.getDestination().getY() - car.getCurPlace().getY());
+                dis = Math.min(dis, car.getPower());
+                car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY() + dis);
+                car.setPower(car.getPower() - dis);
+            } else if(car.getCurPlace().getY() > car.getDestination().getY()){
+                double dis = Math.min(speed, car.getCurPlace().getY() - car.getDestination().getY());
+                dis = Math.min(dis, car.getPower());
+                car.setCurPlace(car.getCurPlace().getX(),car.getCurPlace().getY() - dis);
+                car.setPower(car.getPower() - dis);
+            }
+            if(car.getCurPlace().getX() == car.getDestination().getX() && car.getCurPlace().getY() == car.getDestination().getY()) {
+                car.setCurSpeed(0);
                 car.setState("ARRIVED");
-                for(int j = 1; stationMap.containsKey(String.valueOf(j)); ++j) {
-                    Station sta = stationMap.get(String.valueOf(j));
-                    if(sta.addACar(car)) {
-                        if(sta.getLineSize()<=sta.getNumber())
-                            car.setState("CHARGING");
-                        else {
-                            sta.removeACar(car);
-                            car.setState("RUNNING");
+                if(car.getPower() < 200) {
+                    for (int j = 1; stationMap.containsKey(String.valueOf(j)); ++j) {
+                        Station sta = stationMap.get(String.valueOf(j));
+                        if (sta.addACar(car)) {
+                            if (sta.getLineSize() <= sta.getNumber())
+                                car.setState("CHARGING");
+                            else {
+                                sta.removeACar(car);
+                                car.setState("RUNNING");
+                            }
                         }
                     }
-                    stationMap.replace(String.valueOf(j),sta);
                 }
             }
         } else if(car.getState().equals("CHARGING")){
-            car.setSpeed(0);
-            if(car.getPower()+5*powerT<car.getCapacity())
-                car.setPower(car.getPower()+5*powerT);
-            else {
+            car.setCurSpeed(0);
+            double chargingSpeed = 0.0;
+            Station nowStation = null;
+            for(int j = 1; stationMap.containsKey(String.valueOf(j)); ++j) {
+                Station sta = stationMap.get(String.valueOf(j));
+                if(sta.hasACar(car)) {
+                    chargingSpeed = sta.getChargingSpeed();
+                    nowStation = sta;
+                    break;
+                }
+            }
+            if(chargingSpeed == 0.0) {
+                car.setState("RUNNING");
+            } else if(car.getPower() + chargingSpeed < car.getCapacity()) {
+                car.setPower(car.getPower() + chargingSpeed);
+            } else {
                 car.setPower(car.getCapacity());
                 car.setState("RUNNING");
                 car.setDestination(car.getFinalDestination());
-                if(car.getCurPlace().getX()==car.getFinalDestination().getX()&&car.getCurPlace().getY()==car.getFinalDestination().getY()) {
+                if(car.getCurPlace().getX() == car.getFinalDestination().getX() && car.getCurPlace().getY() == car.getFinalDestination().getY()) {
                     car.setState("ARRIVED");
                 }
-                for(int j = 1; stationMap.containsKey(String.valueOf(j)); ++j) {
-                    Station sta = stationMap.get(String.valueOf(j));
-                    sta.removeACar(car);
-                    stationMap.replace(String.valueOf(j),sta);
-                }
+                boolean b = nowStation.removeACar(car);
+                System.out.println("b = " + b);
             }
         } else if(car.getState().equals("ARRIVED")) {
-            car.setSpeed(0);
+            car.setCurSpeed(0);
             car.setState("RUNNING");
-            if(car.getCurPlace().getX()==placeMap.get(car.getWorkPlaceID()).getX()&&car.getCurPlace().getY()==placeMap.get(car.getWorkPlaceID()).getY()){
+            if(car.getCurPlace().getX() == placeMap.get(car.getWorkPlaceID()).getX() && car.getCurPlace().getY() == placeMap.get(car.getWorkPlaceID()).getY()){
                 car.setDestination(placeMap.get(car.getHomePlaceID()));
                 car.setFinalDestination(placeMap.get(car.getHomePlaceID()));
             } else {
