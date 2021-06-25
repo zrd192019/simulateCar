@@ -13,14 +13,6 @@ import java.util.HashMap;
  */
 public class SimulationModel  {
 
-    private final int RUNNING = 0;
-
-    private final int CHARGING = 1;
-
-    private final int ARRIVED = 2;
-
-    private final int FULL = 3;
-
     private HashMap<String, Place> placeMap = new HashMap<>(); // all places
 
     private HashMap<String, Car> carMap = new HashMap<>(); // all cars
@@ -49,8 +41,13 @@ public class SimulationModel  {
         str += "编号\t电量\t速度\t当前位置\t居住地\t工作地\t运行状态\t当前目的地\t最终目的地\n";
         for(int i = 1; carMap.containsKey(String.valueOf(i)); ++i) {
             Car car = carMap.get(String.valueOf(i));
+            String state = "正在行驶";
+            if(car.getState().equals("ARRIVED"))
+                state = "已到达";
+            else if(car.getState().equals("CHARGING"))
+                state = "正在充电";
             str += String.format("%s\t%.0f/%.0f\t%.0f\t(%.0f,%.0f)\t%s\t%s\t%s\t(%.0f,%.0f)\t(%.0f,%.0f)\n", car.getId(), car.getPower(), car.getCapacity(),
-                    car.getCurSpeed(), car.getCurPlace().getX(), car.getCurPlace().getY(), car.getHomePlaceID(), car.getWorkPlaceID(),car.getState(), car.getDestination().getX(), car.getDestination().getY(), car.getFinalDestination().getX(), car.getFinalDestination().getY());
+                    car.getCurSpeed(), car.getCurPlace().getX(), car.getCurPlace().getY(), car.getHomePlaceID(), car.getWorkPlaceID(), state, car.getDestination().getX(), car.getDestination().getY(), car.getFinalDestination().getX(), car.getFinalDestination().getY());
         }
         carText = str;
     }
