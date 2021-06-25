@@ -22,8 +22,12 @@ public class Car {
     private String workPlaceID; // nearly everyday needs to go work
 
     private Place curPlace; // current place of the car
-    
+
     private String state;
+
+    private Place destination;
+
+    private Place finalDestination;
 
     public Car(String id, double capacity, double speed, String homePlaceID, String workPlaceID, Place curPlace) {
         this.id = id;
@@ -34,6 +38,23 @@ public class Car {
         this.workPlaceID = workPlaceID;
         this.curPlace = curPlace;
         this.state="RUNNING";
+
+    }
+
+    public void setDestination(Place destination) {
+        this.destination=destination;
+    }
+
+    public Place getDestination() {
+        return destination;
+    }
+
+    public void setFinalDestination(Place finDes) {
+        this.finalDestination =finDes;
+    }
+
+    public Place getFinalDestination() {
+        return finalDestination;
     }
 
     public String getId() {
@@ -65,24 +86,23 @@ public class Car {
     }
 
     public void setCurPlace(double x,double y) {
-    	this.curPlace.setX(x);
-    	this.curPlace.setY(y);
+        this.curPlace.setX(x);
+        this.curPlace.setY(y);
     }
 
     public void setPower(double power) {
-    	this.power = power;
+        this.power = power;
     }
 
     public void setSpeed(double speed) {
-    	this.speed = speed;
+        this.speed = speed;
     }
 
     public void setState(String state) {
-    	this.state=state;
+        this.state=state;
     }
 
     public String getState() {
-    	return state;
+        return state;
     }
-
 }
